@@ -103,6 +103,12 @@ Luego abre en el navegador:
 http://localhost:3000
 ```
 
+Production:
+
+```bash
+https://qr-a.netlify.app/
+```
+
 ## Estructura del proyecto
 
 La estructura principal del proyecto es:

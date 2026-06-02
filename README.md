@@ -1,36 +1,272 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QR Generator - Next.js
 
-## Getting Started
+Aplicación web gratuita para generar códigos QR a partir de enlaces.
+El usuario solo debe pegar una URL válida, generar el QR y descargarlo como imagen PNG.
 
-First, run the development server:
+## Tabla de contenido
+
+* [Descripción](#descripción)
+* [Tecnologías utilizadas](#tecnologías-utilizadas)
+* [Características](#características)
+* [Requisitos previos](#requisitos-previos)
+* [Instalación](#instalación)
+* [Ejecución local](#ejecución-local)
+* [Estructura del proyecto](#estructura-del-proyecto)
+* [Funcionamiento general](#funcionamiento-general)
+* [Librería de QR](#librería-de-qr)
+* [Deploy](#deploy)
+* [Mejoras futuras](#mejoras-futuras)
+* [Comandos útiles](#comandos-útiles)
+
+## Descripción
+
+Este proyecto permite generar códigos QR desde una aplicación web construida con Next.js.
+
+La aplicación funciona completamente desde el frontend, por lo que no necesita backend, base de datos ni API externa para generar los códigos QR.
+
+El flujo principal es:
+
+1. El usuario ingresa un enlace.
+2. La aplicación valida que sea una URL válida.
+3. Se genera un código QR en pantalla.
+4. El usuario puede descargar el QR como imagen PNG.
+
+## Tecnologías utilizadas
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+* qrcode.react
+
+## Características
+
+* Generación gratuita de códigos QR.
+* Validación básica de enlaces.
+* Vista previa del QR generado.
+* Descarga del QR en formato PNG.
+* Diseño responsive.
+* Funcionamiento sin backend.
+* No requiere base de datos.
+* No requiere variables de entorno.
+
+## Requisitos previos
+
+Antes de ejecutar el proyecto, asegúrate de tener instalado:
+
+* Node.js 18 o superior
+* npm, yarn, pnpm o bun
+
+Puedes validar tu versión de Node.js con:
+
+```bash
+node -v
+```
+
+Y tu versión de npm con:
+
+```bash
+npm -v
+```
+
+## Instalación
+
+Clona el repositorio:
+
+```bash
+git clone <URL_DEL_REPOSITORIO>
+```
+
+Entra a la carpeta del proyecto:
+
+```bash
+cd qr-generator
+```
+
+Instala las dependencias:
+
+```bash
+npm install
+```
+
+## Ejecución local
+
+Para levantar el proyecto en ambiente local, ejecuta:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Luego abre en el navegador:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Estructura del proyecto
 
-## Learn More
+La estructura principal del proyecto es:
 
-To learn more about Next.js, take a look at the following resources:
+```txt
+qr-generator/
+├─ src/
+│  ├─ app/
+│  │  ├─ page.tsx
+│  │  ├─ layout.tsx
+│  │  └─ globals.css
+├─ public/
+├─ package.json
+├─ tailwind.config.ts
+├─ tsconfig.json
+└─ README.md
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Funcionamiento general
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+La página principal se encuentra en:
 
-## Deploy on Vercel
+```txt
+src/app/page.tsx
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Esta página contiene toda la lógica del generador QR.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+El usuario escribe un enlace en el input:
+
+```tsx
+<input
+  type="url"
+  placeholder="https://ejemplo.com"
+  value={url}
+  onChange={(event) => setUrl(event.target.value)}
+/>
+```
+
+Luego, al presionar el botón de generar, se valida la URL:
+
+```tsx
+const isValidUrl = (value: string) => {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+};
+```
+
+Si la URL es válida, se guarda el valor y se muestra el QR:
+
+```tsx
+<QRCodeCanvas
+  value={qrValue}
+  size={260}
+  level="H"
+  includeMargin
+/>
+```
+
+Finalmente, el botón de descarga convierte el QR generado en un archivo PNG:
+
+```tsx
+const pngUrl = canvas.toDataURL("image/png");
+```
+
+## Librería de QR
+
+Este proyecto utiliza la librería:
+
+```bash
+qrcode.react
+```
+
+Instalación:
+
+```bash
+npm install qrcode.react
+```
+
+Uso básico:
+
+```tsx
+import { QRCodeCanvas } from "qrcode.react";
+
+<QRCodeCanvas value="https://ejemplo.com" size={260} />
+```
+
+## Deploy
+
+Este proyecto puede desplegarse fácilmente en plataformas como:
+
+* Vercel
+* Netlify
+* Railway
+
+La opción recomendada es Vercel, ya que el proyecto está construido con Next.js.
+
+### Deploy en Vercel
+
+1. Subir el proyecto a GitHub.
+2. Entrar a Vercel.
+3. Seleccionar `New Project`.
+4. Importar el repositorio.
+5. Hacer clic en `Deploy`.
+
+No se necesitan variables de entorno para esta versión.
+
+## Mejoras futuras
+
+Algunas mejoras que se pueden agregar más adelante:
+
+* Cambiar color del QR.
+* Cambiar color de fondo.
+* Seleccionar tamaño del QR.
+* Descargar en SVG.
+* Agregar logo al centro del QR.
+* Agregar nombre personalizado al archivo.
+* Agregar historial local de códigos generados.
+* Agregar modo oscuro.
+* Agregar soporte para texto, WhatsApp, emails o ubicación.
+* Agregar diseño de landing page pública.
+
+## Comandos útiles
+
+Instalar dependencias:
+
+```bash
+npm install
+```
+
+Ejecutar en desarrollo:
+
+```bash
+npm run dev
+```
+
+Generar build de producción:
+
+```bash
+npm run build
+```
+
+Ejecutar build de producción:
+
+```bash
+npm start
+```
+
+Ejecutar revisión de lint:
+
+```bash
+npm run lint
+```
+
+## Notas importantes
+
+Esta aplicación no almacena los enlaces ingresados por los usuarios.
+
+Todo el proceso de generación del QR ocurre directamente en el navegador, por lo que es una solución simple, rápida y gratuita.
+
+## Licencia
+
+Este proyecto puede ser utilizado y modificado libremente según las necesidades del equipo o del cliente.

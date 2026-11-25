@@ -1,278 +1,90 @@
-# QR Generator - Next.js
+# QR Generator
 
-Aplicación web gratuita para generar códigos QR a partir de enlaces.
-El usuario solo debe pegar una URL válida, generar el QR y descargarlo como imagen PNG.
+Generador de códigos QR gratuito: pegas un enlace y descargas el QR en **PNG de alta resolución** o **SVG**. Sin registro ni marcas de agua, y el enlace nunca sale de tu navegador.
 
-## Tabla de contenido
-
-* [Descripción](#descripción)
-* [Tecnologías utilizadas](#tecnologías-utilizadas)
-* [Características](#características)
-* [Requisitos previos](#requisitos-previos)
-* [Instalación](#instalación)
-* [Ejecución local](#ejecución-local)
-* [Estructura del proyecto](#estructura-del-proyecto)
-* [Funcionamiento general](#funcionamiento-general)
-* [Librería de QR](#librería-de-qr)
-* [Deploy](#deploy)
-* [Mejoras futuras](#mejoras-futuras)
-* [Comandos útiles](#comandos-útiles)
-
-## Descripción
-
-Este proyecto permite generar códigos QR desde una aplicación web construida con Next.js.
-
-La aplicación funciona completamente desde el frontend, por lo que no necesita backend, base de datos ni API externa para generar los códigos QR.
-
-El flujo principal es:
-
-1. El usuario ingresa un enlace.
-2. La aplicación valida que sea una URL válida.
-3. Se genera un código QR en pantalla.
-4. El usuario puede descargar el QR como imagen PNG.
-
-## Tecnologías utilizadas
-
-* Next.js
-* React
-* TypeScript
-* Tailwind CSS
-* qrcode.react
+**Demo:** https://qr-a.netlify.app
 
 ## Características
 
-* Generación gratuita de códigos QR.
-* Validación básica de enlaces.
-* Vista previa del QR generado.
-* Descarga del QR en formato PNG.
-* Diseño responsive.
-* Funcionamiento sin backend.
-* No requiere base de datos.
-* No requiere variables de entorno.
+- Validación estricta: solo se aceptan enlaces `http://` y `https://`. Si escribes `ejemplo.com`, se agrega `https://` automáticamente.
+- Vista previa vectorial (SVG) del QR.
+- Descarga en **PNG de 512, 1024 o 2048 px** o en **SVG** (escalable, ideal para imprenta).
+- Nombre de archivo según el dominio (`qr-ejemplo-com.png`).
+- Corrección de errores nivel **H** (30 %): el QR sigue leyéndose aunque se dañe o se le ponga un logo encima.
+- SEO listo: metadata en español, Open Graph con imagen generada, `robots.txt` y `sitemap.xml`.
+- Accesible: formulario semántico, errores anunciados por lectores de pantalla (`aria-live`) y `aria-invalid`.
+- Sin backend, base de datos ni variables de entorno.
 
-## Requisitos previos
+## Tecnologías
 
-Antes de ejecutar el proyecto, asegúrate de tener instalado:
+- [Next.js 16](https://nextjs.org) (App Router)
+- React 19 + TypeScript
+- Tailwind CSS 4
+- [qrcode.react](https://github.com/zpao/qrcode.react)
 
-* Node.js 18 o superior
-* npm, yarn, pnpm o bun
+## Requisitos
 
-Puedes validar tu versión de Node.js con:
+- Node.js 20.9 o superior
+- npm
 
-```bash
-node -v
-```
-
-Y tu versión de npm con:
-
-```bash
-npm -v
-```
-
-## Instalación
-
-Clona el repositorio:
+## Instalación y uso
 
 ```bash
-git clone <https://github.com/xicaaay/generatorQR.git>
-```
-
-Entra a la carpeta del proyecto:
-
-```bash
-cd qr-generator
-```
-
-Instala las dependencias:
-
-```bash
+git clone https://github.com/xicaaay/generatorQR.git
+cd generatorQR
 npm install
-```
-
-## Ejecución local
-
-Para levantar el proyecto en ambiente local, ejecuta:
-
-```bash
 npm run dev
 ```
 
-Luego abre en el navegador:
+Abre http://localhost:3000.
 
-```bash
-http://localhost:3000
-```
+## Comandos
 
-Production:
+| Comando | Descripción |
+| --- | --- |
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm start` | Sirve el build de producción |
+| `npm run lint` | Revisión con ESLint |
 
-```bash
-https://qr-a.netlify.app/
-```
-
-## Estructura del proyecto
-
-La estructura principal del proyecto es:
+## Estructura
 
 ```txt
-qr-generator/
-├─ src/
-│  ├─ app/
-│  │  ├─ page.tsx
-│  │  ├─ layout.tsx
-│  │  └─ globals.css
-├─ public/
-├─ package.json
-├─ tailwind.config.ts
-├─ tsconfig.json
-└─ README.md
+generatorQR/
+├─ app/
+│  ├─ layout.tsx            # Metadata global, fuentes, idioma
+│  ├─ page.tsx              # Página (Server Component) + preguntas frecuentes
+│  ├─ globals.css
+│  ├─ icon.svg              # Favicon
+│  ├─ opengraph-image.tsx   # Imagen para compartir en redes (generada)
+│  ├─ robots.ts
+│  └─ sitemap.ts
+├─ components/
+│  └─ QrGenerator.tsx       # Formulario, vista previa y descargas (Client Component)
+├─ lib/
+│  ├─ site.ts               # URL pública y nombre del sitio
+│  └─ url.ts                # Validación y normalización de enlaces
+└─ package.json
 ```
 
-## Funcionamiento general
+## Cómo funciona
 
-La página principal se encuentra en:
-
-```txt
-src/app/page.tsx
-```
-
-Esta página contiene toda la lógica del generador QR.
-
-El usuario escribe un enlace en el input:
-
-```tsx
-<input
-  type="url"
-  placeholder="https://ejemplo.com"
-  value={url}
-  onChange={(event) => setUrl(event.target.value)}
-/>
-```
-
-Luego, al presionar el botón de generar, se valida la URL:
-
-```tsx
-const isValidUrl = (value: string) => {
-  try {
-    new URL(value);
-    return true;
-  } catch {
-    return false;
-  }
-};
-```
-
-Si la URL es válida, se guarda el valor y se muestra el QR:
-
-```tsx
-<QRCodeCanvas
-  value={qrValue}
-  size={260}
-  level="H"
-  includeMargin
-/>
-```
-
-Finalmente, el botón de descarga convierte el QR generado en un archivo PNG:
-
-```tsx
-const pngUrl = canvas.toDataURL("image/png");
-```
-
-## Librería de QR
-
-Este proyecto utiliza la librería:
-
-```bash
-qrcode.react
-```
-
-Instalación:
-
-```bash
-npm install qrcode.react
-```
-
-Uso básico:
-
-```tsx
-import { QRCodeCanvas } from "qrcode.react";
-
-<QRCodeCanvas value="https://ejemplo.com" size={260} />
-```
+1. `normalizeUrl()` (`lib/url.ts`) limpia el texto, agrega `https://` si falta y rechaza esquemas peligrosos como `javascript:`, `data:` o `file:`.
+2. La vista previa se dibuja con `QRCodeSVG`.
+3. Para el PNG se renderiza un `QRCodeCanvas` oculto con la resolución elegida y se exporta con `canvas.toDataURL()`.
+4. Para el SVG se serializa el `<svg>` de la vista previa con `XMLSerializer`.
 
 ## Deploy
 
-Este proyecto puede desplegarse fácilmente en plataformas como:
+El sitio está desplegado en **Netlify** (https://qr-a.netlify.app). Si cambias de dominio, actualiza `SITE_URL` en `lib/site.ts`: de ese valor dependen las URLs canónicas, Open Graph y el sitemap.
 
-* Vercel
-* Netlify
-* Railway
+## Roadmap
 
-La opción recomendada es Vercel, ya que el proyecto está construido con Next.js.
+- Colores personalizados y logo al centro.
+- Tipos de QR: WiFi, WhatsApp, vCard, email, texto y ubicación.
+- Generación masiva desde CSV con descarga en ZIP.
+- Historial local.
 
-### Deploy en Vercel
+## Privacidad
 
-1. Subir el proyecto a GitHub.
-2. Entrar a Vercel.
-3. Seleccionar `New Project`.
-4. Importar el repositorio.
-5. Hacer clic en `Deploy`.
-
-No se necesitan variables de entorno para esta versión.
-
-## Mejoras futuras
-
-Algunas mejoras que se pueden agregar más adelante:
-
-* Cambiar color del QR.
-* Cambiar color de fondo.
-* Seleccionar tamaño del QR.
-* Descargar en SVG.
-* Agregar logo al centro del QR.
-* Agregar nombre personalizado al archivo.
-* Agregar historial local de códigos generados.
-* Agregar modo oscuro.
-* Agregar soporte para texto, WhatsApp, emails o ubicación.
-* Agregar diseño de landing page pública.
-
-## Comandos útiles
-
-Instalar dependencias:
-
-```bash
-npm install
-```
-
-Ejecutar en desarrollo:
-
-```bash
-npm run dev
-```
-
-Generar build de producción:
-
-```bash
-npm run build
-```
-
-Ejecutar build de producción:
-
-```bash
-npm start
-```
-
-Ejecutar revisión de lint:
-
-```bash
-npm run lint
-```
-
-## Notas importantes
-
-Esta aplicación no almacena los enlaces ingresados por los usuarios.
-
-Todo el proceso de generación del QR ocurre directamente en el navegador, por lo que es una solución simple, rápida y gratuita.
-
-## Licencia
-
-Este proyecto puede ser utilizado y modificado libremente según las necesidades del equipo o del cliente.
+La aplicación no almacena ni envía los enlaces. Todo el QR se genera en el navegador.

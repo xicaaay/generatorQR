@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const title = "Generador de códigos QR gratis · PNG HD y SVG";
+const title = "Generador de códigos QR gratis · WiFi, WhatsApp, logo y SVG";
 const description =
-  "Crea códigos QR gratis a partir de cualquier enlace y descárgalos en PNG de alta resolución o SVG. Sin registro, sin marcas de agua y 100% en tu navegador.";
+  "Crea códigos QR gratis para enlaces, WhatsApp, WiFi, email o contactos. Personaliza colores y logo y descárgalos en PNG HD o SVG. Sin registro y 100% en tu navegador.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -29,6 +29,10 @@ export const metadata: Metadata = {
     "QR para enlace",
     "QR PNG",
     "QR SVG",
+    "QR WiFi",
+    "QR WhatsApp",
+    "QR con logo",
+    "QR vCard",
   ],
   alternates: { canonical: "/" },
   openGraph: {

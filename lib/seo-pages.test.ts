@@ -20,6 +20,7 @@ describe("páginas SEO", () => {
     for (const page of ALL_PAGES) {
       expect(page.title.length, page.title).toBeLessThanOrEqual(70);
       expect(page.description.length, page.description).toBeGreaterThanOrEqual(70);
+      expect(page.faqs.length, page.slug).toBeGreaterThan(0);
       expect(page.description.length, page.description).toBeLessThanOrEqual(170);
     }
   });

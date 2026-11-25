@@ -5,7 +5,7 @@ import type { QrFields, QrType, WifiEncryption } from "@/lib/payloads";
 import { MAX_TEXT_LENGTH } from "@/lib/payloads";
 
 const inputClass =
-  "w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 outline-none transition focus:border-neutral-900 aria-invalid:border-red-500";
+  "w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-neutral-900 focus:bg-white aria-invalid:border-red-500";
 
 interface FieldProps {
   label: string;
@@ -19,7 +19,7 @@ function Field({ label, hint, children }: FieldProps) {
 
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-neutral-700 mb-2">
+      <label htmlFor={id} className="mb-1.5 block text-sm text-neutral-600">
         {label}
       </label>
       {children(id, hintId)}
@@ -78,7 +78,7 @@ export default function QrFieldsForm<T extends QrType>(props: QrFieldsProps<T>) 
       const f = props.fields as QrFields["whatsapp"];
       return (
         <div className="space-y-4">
-          <Field label="Número de WhatsApp" hint="Incluye el código de país. Ejemplo: 502 5555 1234">
+          <Field label="Número con código de país">
             {(id, hintId) => (
               <input
                 id={id}
@@ -94,7 +94,7 @@ export default function QrFieldsForm<T extends QrType>(props: QrFieldsProps<T>) 
               />
             )}
           </Field>
-          <Field label="Mensaje (opcional)" hint="Se escribe solo al abrir el chat.">
+          <Field label="Mensaje (opcional)">
             {(id, hintId) => (
               <textarea
                 id={id}
@@ -115,7 +115,7 @@ export default function QrFieldsForm<T extends QrType>(props: QrFieldsProps<T>) 
       const f = props.fields as QrFields["wifi"];
       return (
         <div className="space-y-4">
-          <Field label="Nombre de la red (SSID)">
+          <Field label="Nombre de la red">
             {(id) => (
               <input
                 id={id}
@@ -138,7 +138,7 @@ export default function QrFieldsForm<T extends QrType>(props: QrFieldsProps<T>) 
                 onChange={(e) =>
                   set("encryption", e.target.value as WifiEncryption)
                 }
-                className={`${inputClass} bg-white`}
+                className={inputClass}
               >
                 <option value="WPA">WPA / WPA2 / WPA3</option>
                 <option value="WEP">WEP</option>
@@ -147,7 +147,7 @@ export default function QrFieldsForm<T extends QrType>(props: QrFieldsProps<T>) 
             )}
           </Field>
           {f.encryption !== "nopass" && (
-            <Field label="Contraseña" hint="No se guarda en el historial.">
+            <Field label="Contraseña">
               {(id, hintId) => (
                 <input
                   id={id}

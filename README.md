@@ -19,7 +19,8 @@ Generador de códigos QR gratuito para **enlaces, WhatsApp, WiFi, email, texto y
 - Descarga en **PNG de 512, 1024 o 2048 px** o en **SVG** (escalable, ideal para imprenta).
 - Nombre de archivo según el contenido (`qr-ejemplo-com.png`, `qr-wifi-casa.svg`…).
 - **Historial local** de los últimos 10 QR. Las contraseñas WiFi nunca se guardan.
-- **Una página por tipo** (`/qr-whatsapp`, `/qr-wifi`, `/qr-email`, `/qr-contacto`, `/qr-texto`). Cada una tiene su título, descripción, imagen Open Graph, pasos, ideas de uso, preguntas frecuentes y enlaces internos.
+- **Una página por tipo** (`/qr-whatsapp`, `/qr-wifi`, `/qr-email`, `/qr-contacto`, `/qr-texto`). Cada una tiene su título, descripción, imagen Open Graph y preguntas frecuentes. Las pestañas son enlaces entre páginas y el contenido y el estilo se conservan al cambiar de tipo.
+- **Diseño minimalista:** los errores aparecen al salir del formulario, no mientras escribes, y las preguntas frecuentes están plegadas.
 - **Datos estructurados** (JSON-LD con `WebApplication`, `FAQPage` y `BreadcrumbList`), `robots.txt` y `sitemap.xml`.
 - **PWA instalable y sin conexión:** manifest, íconos (incluido el maskable) y service worker.
 - Accesible: formularios semánticos, errores anunciados con `aria-live` y `aria-invalid`.
@@ -75,7 +76,7 @@ generatorQR/
 │  ├─ sw.js                 # Service worker (uso sin conexión)
 │  └─ icons/                # Íconos PWA 192, 512 y maskable
 ├─ components/
-│  ├─ SeoLanding.tsx        # Plantilla de página: generador, pasos, FAQ, JSON-LD
+│  ├─ SeoLanding.tsx        # Plantilla de página: generador, FAQ, JSON-LD, footer
 │  ├─ ServiceWorker.tsx     # Registra el SW en producción
 │  ├─ QrGenerator.tsx       # Tipos, estilo, vista previa, descargas e historial
 │  └─ QrFields.tsx          # Formulario de cada tipo de QR
@@ -85,6 +86,7 @@ generatorQR/
 │  ├─ color.ts              # Contraste WCAG y avisos de legibilidad
 │  ├─ history.ts            # Historial en localStorage (useSyncExternalStore)
 │  ├─ seo-pages.ts          # Contenido SEO de cada página
+│  ├─ session.ts            # Estado compartido entre páginas de tipo (en memoria)
 │  ├─ og.tsx                # Plantilla de imágenes Open Graph
 │  ├─ site.ts               # URL pública y nombre del sitio
 │  └─ *.test.ts             # Tests
@@ -103,7 +105,7 @@ generatorQR/
 1. Agrega la entrada en `SEO_PAGES` (`lib/seo-pages.ts`).
 2. Agrega su ruta a `PAGES` en `public/sw.js`.
 
-Un test verifica que ambos estén sincronizados y que cada tipo de QR tenga su página. La ruta, el sitemap, la imagen Open Graph y los enlaces internos se generan solos.
+Un test verifica que ambos estén sincronizados y que cada tipo de QR tenga su página. La ruta, la pestaña, el sitemap y la imagen Open Graph se generan solos.
 
 ## Sin conexión (PWA)
 

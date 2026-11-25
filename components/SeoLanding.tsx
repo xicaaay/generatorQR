@@ -1,7 +1,8 @@
-import Link from "next/link";
 import QrGenerator from "@/components/QrGenerator";
-import { ALL_PAGES, type SeoPage } from "@/lib/seo-pages";
+import type { SeoPage } from "@/lib/seo-pages";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
+
+const KEYGEN_URL = "https://api-token-generator.netlify.app/";
 
 function pageUrl(page: SeoPage) {
   return page.slug ? `${SITE_URL}/${page.slug}` : SITE_URL;
@@ -13,7 +14,7 @@ function jsonLd(page: SeoPage) {
   const graph: Record<string, unknown>[] = [
     {
       "@type": "WebApplication",
-      name: page.slug ? `${page.name} · ${SITE_NAME}` : SITE_NAME,
+      name: page.slug ? `QR de ${page.name} · ${SITE_NAME}` : SITE_NAME,
       url,
       description: page.description,
       applicationCategory: "UtilitiesApplication",
@@ -37,7 +38,7 @@ function jsonLd(page: SeoPage) {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: SITE_NAME, item: SITE_URL },
-        { "@type": "ListItem", position: 2, name: page.name, item: url },
+        { "@type": "ListItem", position: 2, name: `QR de ${page.name}`, item: url },
       ],
     });
   }
@@ -50,86 +51,40 @@ function jsonLd(page: SeoPage) {
 }
 
 export default function SeoLanding({ page }: { page: SeoPage }) {
-  const others = ALL_PAGES.filter((item) => item.slug !== page.slug);
-
   return (
-    <main className="min-h-screen bg-neutral-100 flex flex-col items-center px-4 py-10 gap-12">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(page) }} />
+    <>
+      <main className="flex flex-1 flex-col items-center gap-12 px-4 py-10 md:py-16">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(page) }} />
 
-      {page.slug && (
-        <nav aria-label="Ruta de navegación" className="w-full max-w-3xl -mb-8 text-sm text-neutral-500">
-          <ol className="flex gap-2">
-            <li>
-              <Link href="/" className="underline underline-offset-2 hover:text-neutral-900">
-                Inicio
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li aria-current="page" className="text-neutral-900">
-              {page.name}
-            </li>
-          </ol>
-        </nav>
-      )}
+        <QrGenerator type={page.type} heading={page.heading} intro={page.intro} />
 
-      {/* key: al navegar entre tipos el generador arranca con el tipo de la página */}
-      <QrGenerator key={page.type} initialType={page.type} heading={page.heading} intro={page.intro} />
-
-      <div className="grid w-full max-w-3xl gap-10 text-neutral-700 md:grid-cols-2">
-        <section aria-labelledby="how-title">
-          <h2 id="how-title" className="text-xl font-bold text-neutral-900 mb-4">
-            Cómo hacerlo
+        <section aria-labelledby="faq-title" className="w-full max-w-3xl px-2">
+          <h2 id="faq-title" className="sr-only">
+            Preguntas frecuentes
           </h2>
-          <ol className="list-decimal space-y-2 pl-5">
-            {page.steps.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-        </section>
-
-        <section aria-labelledby="uses-title">
-          <h2 id="uses-title" className="text-xl font-bold text-neutral-900 mb-4">
-            Ideas de uso
-          </h2>
-          <ul className="list-disc space-y-2 pl-5">
-            {page.uses.map((use) => (
-              <li key={use}>{use}</li>
-            ))}
-          </ul>
-        </section>
-      </div>
-
-      <section aria-labelledby="faq-title" className="w-full max-w-3xl text-neutral-700">
-        <h2 id="faq-title" className="text-xl font-bold text-neutral-900 mb-4">
-          Preguntas frecuentes
-        </h2>
-        <dl className="space-y-4">
           {page.faqs.map(({ q, a }) => (
-            <div key={q}>
-              <dt className="font-semibold text-neutral-900">{q}</dt>
-              <dd className="text-neutral-600 mt-1">{a}</dd>
-            </div>
+            <details key={q} className="group border-b border-neutral-200 py-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-neutral-900">
+                {q}
+                <span
+                  className="text-neutral-400 transition group-open:rotate-45"
+                  aria-hidden="true"
+                >
+                  +
+                </span>
+              </summary>
+              <p className="mt-2 text-neutral-600">{a}</p>
+            </details>
           ))}
-        </dl>
-      </section>
+        </section>
+      </main>
 
-      <nav aria-labelledby="more-title" className="w-full max-w-3xl">
-        <h2 id="more-title" className="text-xl font-bold text-neutral-900 mb-4">
-          Otros generadores de QR
-        </h2>
-        <ul className="flex flex-wrap gap-2">
-          {others.map((item) => (
-            <li key={item.slug || "home"}>
-              <Link
-                href={item.slug ? `/${item.slug}` : "/"}
-                className="inline-block rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition hover:border-neutral-900 hover:text-neutral-900"
-              >
-                {item.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </main>
+      <footer className="px-4 pb-8 text-center text-sm text-neutral-500">
+        ¿Necesitas una API key?{" "}
+        <a href={KEYGEN_URL} className="text-neutral-900 underline-offset-2 hover:underline">
+          Prueba Keygen
+        </a>
+      </footer>
+    </>
   );
 }

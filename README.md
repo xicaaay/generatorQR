@@ -1,278 +1,126 @@
-# QR Generator - Next.js
+# QR Generator
 
-Aplicación web gratuita para generar códigos QR a partir de enlaces.
-El usuario solo debe pegar una URL válida, generar el QR y descargarlo como imagen PNG.
+Generador de códigos QR gratuito para **enlaces, WhatsApp, WiFi, email, texto y contactos (vCard)**. Puedes personalizar colores y logo, y descargarlo en **PNG de alta resolución** o **SVG**. Sin registro ni marcas de agua, y nada sale de tu navegador.
 
-## Tabla de contenido
-
-* [Descripción](#descripción)
-* [Tecnologías utilizadas](#tecnologías-utilizadas)
-* [Características](#características)
-* [Requisitos previos](#requisitos-previos)
-* [Instalación](#instalación)
-* [Ejecución local](#ejecución-local)
-* [Estructura del proyecto](#estructura-del-proyecto)
-* [Funcionamiento general](#funcionamiento-general)
-* [Librería de QR](#librería-de-qr)
-* [Deploy](#deploy)
-* [Mejoras futuras](#mejoras-futuras)
-* [Comandos útiles](#comandos-útiles)
-
-## Descripción
-
-Este proyecto permite generar códigos QR desde una aplicación web construida con Next.js.
-
-La aplicación funciona completamente desde el frontend, por lo que no necesita backend, base de datos ni API externa para generar los códigos QR.
-
-El flujo principal es:
-
-1. El usuario ingresa un enlace.
-2. La aplicación valida que sea una URL válida.
-3. Se genera un código QR en pantalla.
-4. El usuario puede descargar el QR como imagen PNG.
-
-## Tecnologías utilizadas
-
-* Next.js
-* React
-* TypeScript
-* Tailwind CSS
-* qrcode.react
+**Demo:** https://qr-a.netlify.app
 
 ## Características
 
-* Generación gratuita de códigos QR.
-* Validación básica de enlaces.
-* Vista previa del QR generado.
-* Descarga del QR en formato PNG.
-* Diseño responsive.
-* Funcionamiento sin backend.
-* No requiere base de datos.
-* No requiere variables de entorno.
+- **6 tipos de QR:**
+  - **Enlace:** solo acepta `http://` y `https://`, y si escribes `ejemplo.com` agrega `https://` automáticamente.
+  - **WhatsApp:** abre el chat con un mensaje ya escrito (`wa.me`).
+  - **WiFi:** conecta a la red sin escribir la contraseña. Soporta WPA, WEP, redes abiertas y ocultas.
+  - **Email:** `mailto:` con asunto y mensaje.
+  - **Texto libre.**
+  - **Contacto:** vCard 3.0 con nombre, teléfono, email, empresa y sitio web.
+- **Vista previa en vivo** mientras escribes.
+- **Colores personalizados**, con aviso si el contraste es bajo o los colores están invertidos.
+- **Logo al centro** (PNG, JPG, WebP o SVG) con corrección de errores **H**, para que el QR siga leyéndose.
+- Descarga en **PNG de 512, 1024 o 2048 px** o en **SVG** (escalable, ideal para imprenta).
+- Nombre de archivo según el contenido (`qr-ejemplo-com.png`, `qr-wifi-casa.svg`…).
+- **Historial local** de los últimos 10 QR. Las contraseñas WiFi nunca se guardan.
+- **Una página por tipo** (`/qr-whatsapp`, `/qr-wifi`, `/qr-email`, `/qr-contacto`, `/qr-texto`). Cada una tiene su título, descripción, imagen Open Graph y preguntas frecuentes. Las pestañas son enlaces entre páginas y el contenido y el estilo se conservan al cambiar de tipo.
+- **Diseño minimalista:** los errores aparecen al salir del formulario, no mientras escribes, y las preguntas frecuentes están plegadas.
+- **Datos estructurados** (JSON-LD con `WebApplication`, `FAQPage` y `BreadcrumbList`), `robots.txt` y `sitemap.xml`.
+- **PWA instalable y sin conexión:** manifest, íconos (incluido el maskable) y service worker.
+- Accesible: formularios semánticos, errores anunciados con `aria-live` y `aria-invalid`.
+- Sin backend, base de datos ni variables de entorno.
 
-## Requisitos previos
+## Tecnologías
 
-Antes de ejecutar el proyecto, asegúrate de tener instalado:
+- [Next.js 16](https://nextjs.org) (App Router)
+- React 19 + TypeScript
+- Tailwind CSS 4
+- [qrcode.react](https://github.com/zpao/qrcode.react)
 
-* Node.js 18 o superior
-* npm, yarn, pnpm o bun
+## Requisitos
 
-Puedes validar tu versión de Node.js con:
+- Node.js 20.9 o superior
+- npm
 
-```bash
-node -v
-```
-
-Y tu versión de npm con:
-
-```bash
-npm -v
-```
-
-## Instalación
-
-Clona el repositorio:
-
-```bash
-git clone <https://github.com/xicaaay/generatorQR.git>
-```
-
-Entra a la carpeta del proyecto:
+## Instalación y uso
 
 ```bash
-cd qr-generator
-```
-
-Instala las dependencias:
-
-```bash
+git clone https://github.com/xicaaay/generatorQR.git
+cd generatorQR
 npm install
-```
-
-## Ejecución local
-
-Para levantar el proyecto en ambiente local, ejecuta:
-
-```bash
 npm run dev
 ```
 
-Luego abre en el navegador:
+Abre http://localhost:3000.
 
-```bash
-http://localhost:3000
-```
+## Comandos
 
-Production:
+| Comando | Descripción |
+| --- | --- |
+| `npm run dev` | Servidor de desarrollo |
+| `npm test` | Tests unitarios (Vitest) |
+| `npm run build` | Tests + build de producción |
+| `npm start` | Sirve el build de producción |
+| `npm run lint` | Revisión con ESLint |
 
-```bash
-https://qr-a.netlify.app/
-```
-
-## Estructura del proyecto
-
-La estructura principal del proyecto es:
+## Estructura
 
 ```txt
-qr-generator/
-├─ src/
-│  ├─ app/
-│  │  ├─ page.tsx
-│  │  ├─ layout.tsx
-│  │  └─ globals.css
+generatorQR/
+├─ app/
+│  ├─ layout.tsx            # Metadata global, fuentes, idioma, registro del SW
+│  ├─ page.tsx              # Inicio (QR de enlace)
+│  ├─ [slug]/               # Páginas por tipo (estáticas) + su imagen Open Graph
+│  ├─ manifest.ts           # Manifest de la PWA
+│  ├─ icon.svg · apple-icon.png
+│  ├─ opengraph-image.tsx
+│  ├─ robots.ts
+│  └─ sitemap.ts
 ├─ public/
-├─ package.json
-├─ tailwind.config.ts
-├─ tsconfig.json
-└─ README.md
+│  ├─ sw.js                 # Service worker (uso sin conexión)
+│  └─ icons/                # Íconos PWA 192, 512 y maskable
+├─ components/
+│  ├─ SeoLanding.tsx        # Plantilla de página: generador, FAQ, JSON-LD, footer
+│  ├─ ServiceWorker.tsx     # Registra el SW en producción
+│  ├─ QrGenerator.tsx       # Tipos, estilo, vista previa, descargas e historial
+│  └─ QrFields.tsx          # Formulario de cada tipo de QR
+├─ lib/
+│  ├─ payloads.ts           # Contenido de cada tipo (WIFI:, wa.me, mailto:, vCard…)
+│  ├─ url.ts                # Validación y normalización de enlaces
+│  ├─ color.ts              # Contraste WCAG y avisos de legibilidad
+│  ├─ history.ts            # Historial en localStorage (useSyncExternalStore)
+│  ├─ seo-pages.ts          # Contenido SEO de cada página
+│  ├─ session.ts            # Estado compartido entre páginas de tipo (en memoria)
+│  ├─ og.tsx                # Plantilla de imágenes Open Graph
+│  ├─ site.ts               # URL pública y nombre del sitio
+│  └─ *.test.ts             # Tests
+└─ package.json
 ```
 
-## Funcionamiento general
+## Cómo funciona
 
-La página principal se encuentra en:
+1. `buildPayload()` (`lib/payloads.ts`) arma el contenido según el tipo: escapa `; , : " \` en WiFi, codifica el mensaje de WhatsApp, usa `%20` en `mailto:` y escapa la vCard. También rechaza el contenido que supera la capacidad de un QR con corrección H.
+2. La vista previa se dibuja con `QRCodeSVG` en cada cambio.
+3. Para el PNG se renderiza un `QRCodeCanvas` oculto con la resolución elegida y se exporta con `canvas.toDataURL()`.
+4. Para el SVG se serializa el `<svg>` de la vista previa con `XMLSerializer`. Si hay logo, va incrustado como data URL.
 
-```txt
-src/app/page.tsx
-```
+## Agregar una página nueva
 
-Esta página contiene toda la lógica del generador QR.
+1. Agrega la entrada en `SEO_PAGES` (`lib/seo-pages.ts`).
+2. Agrega su ruta a `PAGES` en `public/sw.js`.
 
-El usuario escribe un enlace en el input:
+Un test verifica que ambos estén sincronizados y que cada tipo de QR tenga su página. La ruta, la pestaña, el sitemap y la imagen Open Graph se generan solos.
 
-```tsx
-<input
-  type="url"
-  placeholder="https://ejemplo.com"
-  value={url}
-  onChange={(event) => setUrl(event.target.value)}
-/>
-```
+## Sin conexión (PWA)
 
-Luego, al presionar el botón de generar, se valida la URL:
-
-```tsx
-const isValidUrl = (value: string) => {
-  try {
-    new URL(value);
-    return true;
-  } catch {
-    return false;
-  }
-};
-```
-
-Si la URL es válida, se guarda el valor y se muestra el QR:
-
-```tsx
-<QRCodeCanvas
-  value={qrValue}
-  size={260}
-  level="H"
-  includeMargin
-/>
-```
-
-Finalmente, el botón de descarga convierte el QR generado en un archivo PNG:
-
-```tsx
-const pngUrl = canvas.toDataURL("image/png");
-```
-
-## Librería de QR
-
-Este proyecto utiliza la librería:
-
-```bash
-qrcode.react
-```
-
-Instalación:
-
-```bash
-npm install qrcode.react
-```
-
-Uso básico:
-
-```tsx
-import { QRCodeCanvas } from "qrcode.react";
-
-<QRCodeCanvas value="https://ejemplo.com" size={260} />
-```
+El service worker solo se registra en producción. Usa red primero para las páginas (y la versión guardada si no hay conexión) y caché primero para los recursos con hash. Si haces un cambio incompatible en la caché, sube `VERSION` en `public/sw.js`.
 
 ## Deploy
 
-Este proyecto puede desplegarse fácilmente en plataformas como:
+El sitio está desplegado en **Netlify** (https://qr-a.netlify.app). Si cambias de dominio, actualiza `SITE_URL` en `lib/site.ts`: de ese valor dependen las URLs canónicas, Open Graph y el sitemap.
 
-* Vercel
-* Netlify
-* Railway
+## Roadmap
 
-La opción recomendada es Vercel, ya que el proyecto está construido con Next.js.
+- Generación masiva desde CSV con descarga en ZIP.
+- Puntos y esquinas redondeadas.
+- Analítica sin cookies (Plausible o Umami).
 
-### Deploy en Vercel
+## Privacidad
 
-1. Subir el proyecto a GitHub.
-2. Entrar a Vercel.
-3. Seleccionar `New Project`.
-4. Importar el repositorio.
-5. Hacer clic en `Deploy`.
-
-No se necesitan variables de entorno para esta versión.
-
-## Mejoras futuras
-
-Algunas mejoras que se pueden agregar más adelante:
-
-* Cambiar color del QR.
-* Cambiar color de fondo.
-* Seleccionar tamaño del QR.
-* Descargar en SVG.
-* Agregar logo al centro del QR.
-* Agregar nombre personalizado al archivo.
-* Agregar historial local de códigos generados.
-* Agregar modo oscuro.
-* Agregar soporte para texto, WhatsApp, emails o ubicación.
-* Agregar diseño de landing page pública.
-
-## Comandos útiles
-
-Instalar dependencias:
-
-```bash
-npm install
-```
-
-Ejecutar en desarrollo:
-
-```bash
-npm run dev
-```
-
-Generar build de producción:
-
-```bash
-npm run build
-```
-
-Ejecutar build de producción:
-
-```bash
-npm start
-```
-
-Ejecutar revisión de lint:
-
-```bash
-npm run lint
-```
-
-## Notas importantes
-
-Esta aplicación no almacena los enlaces ingresados por los usuarios.
-
-Todo el proceso de generación del QR ocurre directamente en el navegador, por lo que es una solución simple, rápida y gratuita.
-
-## Licencia
-
-Este proyecto puede ser utilizado y modificado libremente según las necesidades del equipo o del cliente.
+La aplicación no envía nada a ningún servidor: todo el QR se genera en el navegador. El historial y el logo se quedan en tu dispositivo, y las contraseñas WiFi nunca se guardan.

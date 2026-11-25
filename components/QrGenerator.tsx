@@ -71,9 +71,15 @@ function readLogo(file: File): Promise<Logo> {
 
 interface QrGeneratorProps {
   initialType?: QrType;
+  heading?: string;
+  intro?: string;
 }
 
-export default function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
+export default function QrGenerator({
+  initialType = "url",
+  heading = "Crea tu código QR",
+  intro = "Enlaces, WhatsApp, WiFi, email, texto o contacto. Personaliza colores y logo, y descárgalo en PNG HD o SVG.",
+}: QrGeneratorProps) {
   const [type, setType] = useState<QrType>(initialType);
   const [fields, setFields] = useState<QrFields>(EMPTY_FIELDS);
   const [fg, setFg] = useState(DEFAULT_FG);
@@ -181,11 +187,8 @@ export default function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
     <section className="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-6 md:p-8">
       <div className="text-center mb-8">
         <p className="text-sm font-semibold text-neutral-500 mb-2">Generador gratuito</p>
-        <h1 className="text-3xl md:text-4xl font-bold text-neutral-900">Crea tu código QR</h1>
-        <p className="text-neutral-500 mt-3">
-          Enlaces, WhatsApp, WiFi, email, texto o contacto. Personaliza colores y logo, y
-          descárgalo en PNG HD o SVG.
-        </p>
+        <h1 className="text-3xl md:text-4xl font-bold text-neutral-900">{heading}</h1>
+        <p className="text-neutral-500 mt-3">{intro}</p>
       </div>
 
       <div

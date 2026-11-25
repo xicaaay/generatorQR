@@ -19,7 +19,9 @@ Generador de códigos QR gratuito para **enlaces, WhatsApp, WiFi, email, texto y
 - Descarga en **PNG de 512, 1024 o 2048 px** o en **SVG** (escalable, ideal para imprenta).
 - Nombre de archivo según el contenido (`qr-ejemplo-com.png`, `qr-wifi-casa.svg`…).
 - **Historial local** de los últimos 10 QR. Las contraseñas WiFi nunca se guardan.
-- SEO listo: metadata en español, Open Graph con imagen generada, `robots.txt` y `sitemap.xml`.
+- **Una página por tipo** (`/qr-whatsapp`, `/qr-wifi`, `/qr-email`, `/qr-contacto`, `/qr-texto`). Cada una tiene su título, descripción, imagen Open Graph, pasos, ideas de uso, preguntas frecuentes y enlaces internos.
+- **Datos estructurados** (JSON-LD con `WebApplication`, `FAQPage` y `BreadcrumbList`), `robots.txt` y `sitemap.xml`.
+- **PWA instalable y sin conexión:** manifest, íconos (incluido el maskable) y service worker.
 - Accesible: formularios semánticos, errores anunciados con `aria-live` y `aria-invalid`.
 - Sin backend, base de datos ni variables de entorno.
 
@@ -61,14 +63,20 @@ Abre http://localhost:3000.
 ```txt
 generatorQR/
 ├─ app/
-│  ├─ layout.tsx            # Metadata global, fuentes, idioma
-│  ├─ page.tsx              # Página (Server Component) + preguntas frecuentes
-│  ├─ globals.css
-│  ├─ icon.svg              # Favicon
-│  ├─ opengraph-image.tsx   # Imagen para compartir en redes (generada)
+│  ├─ layout.tsx            # Metadata global, fuentes, idioma, registro del SW
+│  ├─ page.tsx              # Inicio (QR de enlace)
+│  ├─ [slug]/               # Páginas por tipo (estáticas) + su imagen Open Graph
+│  ├─ manifest.ts           # Manifest de la PWA
+│  ├─ icon.svg · apple-icon.png
+│  ├─ opengraph-image.tsx
 │  ├─ robots.ts
 │  └─ sitemap.ts
+├─ public/
+│  ├─ sw.js                 # Service worker (uso sin conexión)
+│  └─ icons/                # Íconos PWA 192, 512 y maskable
 ├─ components/
+│  ├─ SeoLanding.tsx        # Plantilla de página: generador, pasos, FAQ, JSON-LD
+│  ├─ ServiceWorker.tsx     # Registra el SW en producción
 │  ├─ QrGenerator.tsx       # Tipos, estilo, vista previa, descargas e historial
 │  └─ QrFields.tsx          # Formulario de cada tipo de QR
 ├─ lib/
@@ -76,6 +84,8 @@ generatorQR/
 │  ├─ url.ts                # Validación y normalización de enlaces
 │  ├─ color.ts              # Contraste WCAG y avisos de legibilidad
 │  ├─ history.ts            # Historial en localStorage (useSyncExternalStore)
+│  ├─ seo-pages.ts          # Contenido SEO de cada página
+│  ├─ og.tsx                # Plantilla de imágenes Open Graph
 │  ├─ site.ts               # URL pública y nombre del sitio
 │  └─ *.test.ts             # Tests
 └─ package.json
@@ -88,16 +98,26 @@ generatorQR/
 3. Para el PNG se renderiza un `QRCodeCanvas` oculto con la resolución elegida y se exporta con `canvas.toDataURL()`.
 4. Para el SVG se serializa el `<svg>` de la vista previa con `XMLSerializer`. Si hay logo, va incrustado como data URL.
 
+## Agregar una página nueva
+
+1. Agrega la entrada en `SEO_PAGES` (`lib/seo-pages.ts`).
+2. Agrega su ruta a `PAGES` en `public/sw.js`.
+
+Un test verifica que ambos estén sincronizados y que cada tipo de QR tenga su página. La ruta, el sitemap, la imagen Open Graph y los enlaces internos se generan solos.
+
+## Sin conexión (PWA)
+
+El service worker solo se registra en producción. Usa red primero para las páginas (y la versión guardada si no hay conexión) y caché primero para los recursos con hash. Si haces un cambio incompatible en la caché, sube `VERSION` en `public/sw.js`.
+
 ## Deploy
 
 El sitio está desplegado en **Netlify** (https://qr-a.netlify.app). Si cambias de dominio, actualiza `SITE_URL` en `lib/site.ts`: de ese valor dependen las URLs canónicas, Open Graph y el sitemap.
 
 ## Roadmap
 
-- Páginas dedicadas por tipo (`/qr-wifi`, `/qr-whatsapp`…) para SEO.
 - Generación masiva desde CSV con descarga en ZIP.
 - Puntos y esquinas redondeadas.
-- PWA para usarlo sin conexión.
+- Analítica sin cookies (Plausible o Umami).
 
 ## Privacidad
 
